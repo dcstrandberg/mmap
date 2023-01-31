@@ -19,7 +19,8 @@ const ListBody = (props) => {
             level={item.level}  
             text={item.text}  
             parent={item.parent}  
-            children={item.children}  
+            children={item.children}
+            addTask={props.addTask}  
         />  
     );
     return (

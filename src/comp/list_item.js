@@ -14,7 +14,13 @@ const ListItem = (props) => {
             
             <IndentButton />
             <UnindentButton />
-            <AddTaskAfterButton />
+            <AddTaskAfterButton 
+                id={props.id}
+                level={props.level}  
+                parent={props.parent}  
+                children={props.children}
+                addTask={props.addTask}
+            />
             <DragTaskButton />
         </div>
     )

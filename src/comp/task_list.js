@@ -9,7 +9,7 @@ const TaskList = (props) => {
     return (
         <div className='TaskList' >
             <Header />
-            <ListBody listItems={props.listItems}/>
+            <ListBody listItems={props.listItems} addTask={props.addTask}/>
             {/* <AddTaskButton /> */}
             {/* <AddTaskModal /> */}
         </div>
