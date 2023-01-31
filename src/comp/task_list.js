@@ -10,10 +10,10 @@ const TaskList = (props) => {
         <div className='TaskList' >
             <Header />
             <ListBody listItems={props.listItems}/>
-            <AddTaskButton />
-            <AddTaskModal />
+            {/* <AddTaskButton /> */}
+            {/* <AddTaskModal /> */}
         </div>
-    )
+    );
 }
 
 export default TaskList;    

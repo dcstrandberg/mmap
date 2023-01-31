@@ -1,6 +1,6 @@
 const LevelIndicator = (props) => {
     
-    const levelIndicator = "[-] "
+    const levelIndicator = <div className='LevelTick'></div>;
     const levelArray = new Array(props.level).fill(levelIndicator);
 
     return(

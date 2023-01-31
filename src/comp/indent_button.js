@@ -1,7 +1,7 @@
 const IndentButton = (props) => {
     return (
         <span className='IndentButton' >
-            [&lt;&lt;]
+            &lt;
         </span>
     )
 }

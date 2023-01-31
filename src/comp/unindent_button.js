@@ -1,7 +1,7 @@
 const UnindentButton = (props) => {
     return (
         <span className='UnindentButton' >
-            [&gt;&gt;]
+            &gt;
         </span>
     )
 }

@@ -9,12 +9,13 @@ const ListItem = (props) => {
         <div className='ListItem' >
             <LevelIndicator level={props.level}/>
             
-            <span className="ItemText">{props.text}</span>
+            {/* <input type="text" className="ItemText" defaultValue={props.text}></input> */}
+            <textarea className="ItemText" rows="1">{props.text}</textarea>
             
-            <AddTaskAfterButton />
-            <DragTaskButton />
             <IndentButton />
             <UnindentButton />
+            <AddTaskAfterButton />
+            <DragTaskButton />
         </div>
     )
 }

@@ -1,3 +1,4 @@
+/*
 .App {
   text-align: center;
 }
@@ -35,4 +36,206 @@
   to {
     transform: rotate(360deg);
   }
+}
+*/
+
+/* Remove this once the general layout is set */
+/* div {
+  border: 2px solid #777777
+} */
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+.App {
+  height: 100%;
+}
+
+.TaskList {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: top;
+  justify-content: left;
+
+  overflow: hidden;
+
+  height: 100%;
+  width: 100%;
+  /* padding-left: 20px;
+  padding-right: 20px; */
+}
+
+.Header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+
+  background-color: #DDDDDD;
+  height: 10%;
+  width: 100%;
+  
+  border-bottom: solid 2px #555555;
+}
+
+.ListBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background-color: #FFEEDF;
+  height: 90%;
+  width: 100%;
+  /* padding: 5px;  */
+}
+
+.ListItem {
+  display: inline-flex;
+  flex-direction: row;
+  /* justify-content: space-between; */
+  align-items: center;
+
+  /* background-color: #DDDDDD; */
+  height: 8%;
+  width: 90%;
+
+  /* padding: 4px; */
+
+  margin-top: 3px;
+  margin-bottom: 3px;
+
+  border-bottom: solid 1px #888888;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+
+  -webkit-transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.ListItem::after{
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  opacity: 0;
+  -webkit-transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.ListItem:hover{
+  transform: scale(1.02, 1.02);
+}
+
+.ListItem:hover::after{
+  opacity: 1;
+}
+
+.LevelIndicator{
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-left: 10px;
+
+  height: 100%;
+}
+
+.LevelTick{
+  height: 1.3em;
+  aspect-ratio: 1;
+
+  margin-left: 5px;
+
+  background-color: #FFDFCF;
+  border: solid 1px #555555;
+}
+
+.LevelTick:last-child{
+  background-color: #FFAA00;
+}
+
+.ItemText{
+  margin-left: 10px;
+  width: 100%;
+  height: 1em;
+
+  text-align: left;
+  vertical-align: center;
+  overflow-wrap: break-word;
+
+  border: none;
+  background-color: #FFEEDF;
+
+  font-size: 1.3em;
+  resize: none;
+}
+
+.AddTaskAfterButton{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  /* align-items: center; */
+  vertical-align: center;
+
+  margin-left: 20px; 
+  height: 1.5em;
+  aspect-ratio: 1;
+
+  background-color: #FFAA00;
+  border: solid 1px #555555;
+
+}
+
+.IndentButton{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  /* align-items: center; */
+  vertical-align: center;
+
+  margin-left: 20px; 
+  height: 1.5em;
+  aspect-ratio: 1;
+
+  background-color: #FFAA00;
+  border: solid 1px #555555;
+
+}
+
+.UnindentButton{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  /* align-items: center; */
+  vertical-align: center;
+
+  margin-left: 20px; 
+  height: 1.5em;
+  aspect-ratio: 1;
+
+  background-color: #FFAA00;
+  border: solid 1px #555555;
+
+}
+
+.DragTaskButton{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  /* align-items: center; */
+  vertical-align: center;
+
+  margin-left: 20px; 
+  margin-right: 20px; 
+  height: 1.5em;
+  aspect-ratio: 1;
+
+  background-color: #FFAA00;
+  border: solid 1px #555555;
+
 }

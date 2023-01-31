@@ -26,7 +26,7 @@ const ListBody = (props) => {
         <div className='ListBody' >
             {listItems}
         </div>
-    )
+    );
 }
 
 export default ListBody;    

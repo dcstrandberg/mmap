@@ -1,7 +1,7 @@
 const AddTaskAfterButton = (props) => {
     return (
         <span className='AddTaskAfterButton' >
-            [+]
+            +
         </span>
     )
 }
