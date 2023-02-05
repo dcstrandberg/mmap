@@ -1,7 +1,7 @@
 const UnindentButton = (props) => {
     return (
-        <span className='UnindentButton' >
-            &gt;
+        <span className='UnindentButton' onClick={() => props.unindentTask(props.idx)}>
+            &lt;
         </span>
     )
 }

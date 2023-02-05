@@ -1,7 +1,9 @@
 const LevelIndicator = (props) => {
     
-    const levelIndicator = <div className='LevelTick'></div>;
-    const levelArray = new Array(props.level).fill(levelIndicator);
+    // const levelIndicator = ;
+    const levelArray = new Array(props.level).fill(0).map((x, i) => {
+        return <div key={i} className='LevelTick'></div>
+    });
 
     return(
         <span className='LevelIndicator' >

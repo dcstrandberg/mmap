@@ -9,12 +9,35 @@ const ListItem = (props) => {
         <div className='ListItem' >
             <LevelIndicator level={props.level}/>
             
-            {/* <input type="text" className="ItemText" defaultValue={props.text}></input> */}
-            <textarea className="ItemText" rows="1">{props.text}</textarea>
+            <span className="ItemText" >Parent: {props.parent}, Children: {props.children}</span>
+
+            {/*
+            {props.isFocused &&
+                <textarea 
+                    className="ItemText" 
+                    rows="1" 
+                    defaultValue={props.text} 
+                    autoFocus 
+                    onFocus={(e) => props.handleFocus(e)}
+                    onBlur={() => props.outFocus(props.idx)}
+                    onChange={(e) => props.handleTextChange(e, props.idx)}
+                    onKeyDown={(e) => props.handleBlur(e)}
+                ></textarea>
+            }
+            {!(props.isFocused) &&
+                <span 
+                    className="ItemText" 
+                    onClick={() => props.inFocus(props.idx)}
+                >
+                    {props.text}
+                </span>
+            }
+            */}
             
-            <IndentButton />
-            <UnindentButton />
+            <UnindentButton idx={props.idx} unindentTask={props.unindentTask}/>
+            <IndentButton idx={props.idx} indentTask={props.indentTask}/>
             <AddTaskAfterButton 
+                idx={props.idx}
                 id={props.id}
                 level={props.level}  
                 parent={props.parent}  
@@ -22,6 +45,7 @@ const ListItem = (props) => {
                 addTask={props.addTask}
             />
             <DragTaskButton />
+            {/* Need to add a delete task button */}
         </div>
     )
 }

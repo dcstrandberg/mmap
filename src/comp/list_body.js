@@ -12,17 +12,28 @@ const ListBody = (props) => {
 
         }
     */
-    const listItems = props.listItems.map((item, i) =>    
-        <ListItem 
+    const listItems = props.listItems.map((item, i) => {
+        return (<ListItem 
             key={i}
+            idx={i}
             id={item.id}
             level={item.level}  
             text={item.text}  
             parent={item.parent}  
             children={item.children}
+            isFocused={item.isFocused}
             addTask={props.addTask}  
-        />  
-    );
+            inFocus={props.inFocus} 
+            outFocus={props.outFocus}
+            handleTextChange = {props.handleTextChange}
+            handleBlur = {props.handleBlur}
+            handleFocus = {props.handleFocus}
+            indentTask={props.indentTask}
+            unindentTask = {props.unindentTask}
+
+
+        />)
+    });
     return (
         <div className='ListBody' >
             {listItems}

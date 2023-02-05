@@ -9,7 +9,18 @@ const TaskList = (props) => {
     return (
         <div className='TaskList' >
             <Header />
-            <ListBody listItems={props.listItems} addTask={props.addTask}/>
+            <ListBody 
+                listItems={props.listItems} 
+                addTask={props.addTask} 
+                inFocus={props.inFocus} 
+                outFocus={props.outFocus}
+                handleTextChange = {props.handleTextChange}
+                handleBlur = {props.handleBlur}
+                handleFocus = {props.handleFocus}
+                indentTask={props.indentTask}
+                unindentTask = {props.unindentTask}
+
+            />
             {/* <AddTaskButton /> */}
             {/* <AddTaskModal /> */}
         </div>

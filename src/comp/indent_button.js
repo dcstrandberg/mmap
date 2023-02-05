@@ -1,7 +1,7 @@
 const IndentButton = (props) => {
     return (
-        <span className='IndentButton' >
-            &lt;
+        <span className='IndentButton' onClick={() => props.indentTask(props.idx)}>
+            &gt;
         </span>
     )
 }
