@@ -3,6 +3,7 @@ import AddTaskAfterButton from './add_task_after_button.js';
 import DragTaskButton from './drag_task_button.js';
 import IndentButton from './indent_button.js';
 import UnindentButton from './unindent_button.js';
+import DeleteButton from './delete_button.js';
 
 const ListItem = (props) => {
     return (
@@ -44,6 +45,7 @@ const ListItem = (props) => {
                 children={props.children}
                 addTask={props.addTask}
             />
+            <DeleteButton idx={props.idx} deleteTask={props.deleteTask}/>
             <DragTaskButton />
             {/* Need to add a delete task button */}
         </div>

@@ -30,6 +30,7 @@ const ListBody = (props) => {
             handleFocus = {props.handleFocus}
             indentTask={props.indentTask}
             unindentTask = {props.unindentTask}
+            deleteTask = {props.deleteTask}
 
 
         />)

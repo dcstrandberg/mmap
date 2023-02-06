@@ -70,7 +70,7 @@ function App() {
     // Need to add the new task the the appropriate parent
     const parentIdx = getIndex(newParent, newItems);
 
-    newItems[parentIdx].children = newItems[parentIdx].children.concat(newID);
+    newItems[parentIdx].children = newItems[parentIdx].children.concat(newID).slice();
 
     setListItems(newItems);
     
@@ -401,6 +401,46 @@ function App() {
     setListItems(newList);
     return newLevel;
   }
+
+
+  ////////// deleteTask()
+  // Takes the index of a task and deletes it from the state object
+  const deleteTask = (taskIdx) => {
+ 
+    let newList = [...listItems];
+
+    // Get the task ID
+    const id = newList[taskIdx].id;
+    
+    // Need to remove the task from the appropriate parent
+    const parentIndex = findParentIndex(taskIdx, newList);
+    let parentsChildren = newList[parentIndex].children.slice();
+    const removeIdx = parentsChildren.indexOf(id);
+    parentsChildren.splice(removeIdx, 1);
+    // newList[parentIndex].children = parentsChildren;
+
+    // Add item's children to item's parent's children list
+    const childrenList = newList[taskIdx].children;
+    newList[parentIndex].children = parentsChildren.concat(childrenList).slice();
+    
+    // Iterate through children and alter parent
+    
+    childrenList.map((x) => {
+      console.log("Children: " + x);
+      newList[getIndex(x, newList)].parent = newList[parentIndex].id;
+    })
+
+    // And now bump down the level of all descendants
+    newList = mapChildren(taskIdx, newList, (x) => x.level -= 1);
+
+    // And remove the task last -- because otherwise we don't know what's going on 
+    const removedTask = newList.splice(taskIdx, 1);
+    
+    setListItems(newList);
+    
+    return removedTask;
+    
+  }
   
   return (
     <div className="App">
@@ -414,6 +454,7 @@ function App() {
           handleFocus = {handleFocus}
           indentTask={indentTask}
           unindentTask = {unindentTask}
+          deleteTask = {deleteTask}
         />
     </div>
   );
