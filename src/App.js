@@ -40,7 +40,7 @@ function App() {
 
   // Also need to define all the functions that interact with the itemlist? 
   const incrementTaskID = (currentID) => {
-    const newID = currentID++
+    const newID = currentID += 1;
     setNextID(newID);
     return newID;
   }
@@ -67,7 +67,10 @@ function App() {
     const newItems = [...listItems];
     newItems.splice(taskIdx + 1, 0, newTask)
 
-    // console.log(newItems.map(x => x.taskID));
+    // Need to add the new task the the appropriate parent
+    const parentIdx = getIndex(newParent, newItems);
+
+    newItems[parentIdx].children = newItems[parentIdx].children.concat(newID);
 
     setListItems(newItems);
     
@@ -79,7 +82,6 @@ function App() {
 
   /***TEXT AREA CALLBACKS********************************************************************* */
   const inFocus = (idx) => {
-    console.log("In focus");
     const newList = listItems.map((x, i) => {
       if (i === idx) {
         x.isFocused = true;
@@ -93,7 +95,6 @@ function App() {
   
 
   const outFocus = (idx) => {
-    console.log("Out focus");
     const newList = listItems.map((x, i) => {
       // Just setting all isFocused to false, to prevent mulitple from having focus
       x.isFocused = false;
@@ -162,7 +163,6 @@ function App() {
   // Returns a list of the indexes of any children of an item with the given index
   const findChildrenIndices = (idx, stateCopy) => {
     // const idx = getIndex(id);
-    console.log(idx)
     const childIDs = stateCopy[idx].children;
     const childIndices = childIDs.map((x) => getIndex(x, stateCopy));
     
@@ -175,7 +175,6 @@ function App() {
   // Returns modified state object / list
   const mapChildren = (idx, stateCopy, f, paramList = []) => {
     // First get the list of the current children and apply the function to it
-    console.log("map " + idx);
     let childrenIndices = findChildrenIndices(idx, stateCopy);
     
     for (let i = 0; i < childrenIndices.length; i++){
@@ -203,23 +202,54 @@ function App() {
 
   // Function to find the nearest higher-up item that is a level lower than the current item -- to be used for assigning new parents when indenting / unindenting
   const findNewParent = (idx, stateCopy) => {
-    let newParent = -1;
     const itemLevel = stateCopy[idx].level;
 
     for (let i = 1; i < idx + 1; i++) {
       if(stateCopy[idx - i].level < itemLevel) {
-        return stateCopy[idx - i].id;
+        return (idx - i); // stateCopy[idx - i].id;
       }
     }
 
   }
 
+
+  // Function to find the children that a task should have (will be used primarily when unindeting grants new children)
+  const findNewChildren = (idx, stateCopy) => {
+    const itemLevel = stateCopy[idx].level;
+
+    let childIndexList = [];
+
+    // We also want to limit the list to direct children (not grandchildren)
+    // So we need to determine the previous parent of the lowest level child...
+    // ... and only include children of that parent
+    let previousParent = -1;
+
+    
+    // begin at the index and check each task until the level is equal to the item's
+    for (let i = idx + 1; i < stateCopy.length; i++) {
+      // If the item is not a child, then stop looking
+      if (stateCopy[i].level <= itemLevel) {
+        break;
+      }
+      
+      // If it's the first iteration of the loop, check to see who the parent is
+      if (i === idx + 1) {
+        previousParent = stateCopy[i].parent;
+      }
+
+      // And if the child shares that parent, add it to the array
+      if (stateCopy[i].parent === previousParent) {
+        childIndexList.push(i);
+      }
+    }
+
+    return childIndexList;
+  }
+
   
   /***TASK LIST MANIPULATION CALLBACKS**********************************************************************/
-  // Now there's an issue where if you add a task, and unindent it with the desire to make it the new parent task of a group -- it won't
-  // The parent stays
-  // I think the issue is that any time we assign a new parent -- we need to do it by finding the nearest neighbor lower-level task...
-
+  // Now parents are altered correctly if you add a new task then adjust indents
+  
   ////////// indentTask()
   // Takes the index of an item and increments its level, increments all children's levels, and sets parent as immediately above item
   const indentTask = (idx) => {
@@ -247,12 +277,12 @@ function App() {
     
     // Now set the new parent 
     if (idx > 0) {
-      newList[idx].parent = findNewParent(idx, newList); // newList[idx-1].id;
+      newList[idx].parent = newList[findNewParent(idx, newList)].id; // newList[idx-1].id;
     }
     
     // 3) Parent needs to remove IoI from child list -- assuming it's got a parent
     if (parentIndex >= 0) {
-      let parentsChildren = newList[parentIndex].children;
+      let parentsChildren = newList[parentIndex].children.slice();
       const removeIdx = parentsChildren.indexOf(id);
       parentsChildren.splice(removeIdx, 1);
       
@@ -260,13 +290,15 @@ function App() {
     }
     
     // 4) New parent needs to have IoI added to child list
-    // let parentsChildren = newList[parentIndex].children;
+    // Need the slice() method here to change the array's reference in order to force a re-render
     if (idx > 0){
-      newList[findNewParent(idx, newList)].children.push(id);
+      const newChildList = newList[findNewParent(idx, newList)].children.concat(id).slice();
+      newList[findNewParent(idx, newList)].children = newChildList;
     }
     
     // 5) Children need to have their level updated
-    newList = mapChildren(idx, newList, (x) => x.level += 1);
+    const increment = (x) => x.level += 1;
+    newList = mapChildren(idx, newList, increment);
     
     setListItems(newList);
     return newLevel;
@@ -294,6 +326,7 @@ function App() {
     // 3) Parent needs to remove IoI from child list
     // 4) New parent needs to have IoI added to child list
     // 5) Children need to have their level decremented
+    // 6) THIS IS ONLY APPLICABLE TO UNINDENTS - Check to see if you've picked up any new children
     
     // 1)  Item-of-interest needs to have level changed
     // 2) IoI needs to have parent changed to original grandparent
@@ -313,7 +346,7 @@ function App() {
     // 3) Parent needs to remove IoI from child list -- assuming it's got a parent
     // And anything about reassigning parent, etc. only needs to be done if the existing parent is now the same level (or higher) than the item
     if (parentIndex >= 0 && needsNewParent) {
-      let parentsChildren = newList[parentIndex].children;
+      let parentsChildren = newList[parentIndex].children.slice();
       const removeIdx = parentsChildren.indexOf(id);
       parentsChildren.splice(removeIdx, 1);
       
@@ -323,16 +356,52 @@ function App() {
     // 4) New parent needs to have IoI added to child list
     // And anything about reassigning parent, etc. only needs to be done if the existing parent is now the same level (or higher) than the item
     if (newParentIndex >= 0 && needsNewParent){
-      newList[newParentIndex].children.push(id);
+      newList[newParentIndex].children = newList[newParentIndex].children.concat(id).slice();
     }
-    
+  
     // 5) Children need to have their level updated
     newList = mapChildren(idx, newList, (x) => x.level -= 1);
+
+    // 6) THIS IS ONLY APPLICABLE TO UNINDENTS - Check to see if you've picked up any new children and add them to new task/remove them from old task
+    // So we need to :
+    // a. check to see if the item below (or group of items) has higher level BEFORE an item that's at <= level
+    // b. IF SO, make their parent the item
+    // c. remove them from the child list of the old parent
+    // d. add them to the child list of the item
+    if (newList[idx + 1].level > newList[idx].level) {
+      const childIndexList = findNewChildren(idx, newList);
+      const childIDList = childIndexList.map((x) => newList[x].id);
+
+      const previousParent = getIndex(newList[childIndexList[0]].parent, newList);
+
+      // Set the item to be the parent of the children
+      childIndexList.map((x) => {
+        newList[x].parent = newList[idx].id;
+      });
+      
+      // Now remove the children from the old parent's children list
+      let tempChildren = newList[previousParent].children;
+      
+      childIDList.map((id) => {
+        // Check whether the child is in the previousParent's children list
+        const tempIdx = tempChildren.findIndex((x) => x === id);
+        if (tempIdx >= 0) {
+          // If it is, cut it out
+          tempChildren.splice(tempIdx, 1);
+        }
+      });
+      
+      // Need the slice() method here to change the array's reference in order to force a re-render
+      newList[previousParent].children = tempChildren.slice();
+      
+      // And finally, add them to the children list of the item
+      newList[idx].children = newList[idx].children.concat(childIDList);      
+    }
     
     setListItems(newList);
     return newLevel;
   }
-
+  
   return (
     <div className="App">
         <TaskList 

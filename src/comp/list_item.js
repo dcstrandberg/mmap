@@ -9,7 +9,7 @@ const ListItem = (props) => {
         <div className='ListItem' >
             <LevelIndicator level={props.level}/>
             
-            <span className="ItemText" >Parent: {props.parent}, Children: {props.children}</span>
+            <span className="ItemText" >Idx: {props.idx}, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ID: {props.id}, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Parent: {props.parent}, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Children: {props.children}</span>
 
             {/*
             {props.isFocused &&
