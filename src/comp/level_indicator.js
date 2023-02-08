@@ -1,3 +1,5 @@
+import React from 'react';
+
 const LevelIndicator = (props) => {
     
     // const levelIndicator = ;

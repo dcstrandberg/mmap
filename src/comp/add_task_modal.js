@@ -1,4 +1,4 @@
-// import './App.css';
+import React from 'react';
 
 const AddTaskModal = (props) => {
     // props of the form:

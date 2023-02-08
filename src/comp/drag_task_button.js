@@ -1,3 +1,5 @@
+import React from 'react';
+
 const DragTaskButton = (props) => {
     return (
         <span className='DragTaskButton' >

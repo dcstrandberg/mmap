@@ -1,3 +1,5 @@
+import React from 'react';
+
 const DeleteButton = (props) => {
     return (
         <span 

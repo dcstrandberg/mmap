@@ -1,4 +1,7 @@
 import ListItem from './list_item.js';
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import React from 'react';
+
 
 const ListBody = (props) => {
     // items of the form:
@@ -14,7 +17,7 @@ const ListBody = (props) => {
     */
     const listItems = props.listItems.map((item, i) => {
         return (<ListItem 
-            key={i}
+            key={item.id}
             idx={i}
             id={item.id}
             level={item.level}  
@@ -36,9 +39,19 @@ const ListBody = (props) => {
         />)
     });
     return (
-        <div className='ListBody' >
-            {listItems}
-        </div>
+        <DragDropContext onDragEnd={props.onDragEnd}>
+        <Droppable droppableId="list">
+            {provided => (
+                // ref is for DND 
+                <div className='ListBody' ref={provided.innerRef} {...provided.droppableProps}>
+                    {listItems}
+                    {provided.placeholder}
+                </div>
+            )}
+        </Droppable>
+        </DragDropContext>
+            
+    
     );
 }
 

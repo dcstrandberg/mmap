@@ -1,4 +1,4 @@
-// import './App.css';
+import React from 'react';
 
 const AddTaskButton = (props) => {
     // props of the form:

@@ -1,7 +1,8 @@
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
 import TaskList from './comp/task_list.js';
 import { useState } from 'react';
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 // Set the max # of bullets an item can have (deepest the mind map can go):
 const MAXLEVEL = 10;
@@ -248,7 +249,49 @@ function App() {
 
   
   /***TASK LIST MANIPULATION CALLBACKS**********************************************************************/
-  // Now parents are altered correctly if you add a new task then adjust indents
+
+  ////////// reorderList()
+  // Functions to help with reordering
+  const reorderList = (stateCopy, startIndex, endIndex) => {
+    const result = Array.from(stateCopy);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    
+
+    // Need to add logic to see if it's a task with children and include them in the drag....
+
+
+    // TODO: Need to add logic to this to adjust parents, children, and levels
+    // First we find the new parent
+    // Then we add the item to the children of the new parent
+    // Remove it from children of the old parent
+    // And adjust levels as needed
+
+    
+
+    return result;
+  };
+  
+  
+  ////////// onDragEnd()
+  // Functions to help with reordering
+  function onDragEnd(result) {
+    if (!result.destination) {
+      return;
+    }
+
+    if (result.destination.index === result.source.index) {
+      return;
+    }
+
+    const newList = reorderList(
+      listItems,
+      result.source.index,
+      result.destination.index
+    );
+
+    setListItems( newList );
+  }
   
   ////////// indentTask()
   // Takes the index of an item and increments its level, increments all children's levels, and sets parent as immediately above item
@@ -455,6 +498,7 @@ function App() {
           indentTask={indentTask}
           unindentTask = {unindentTask}
           deleteTask = {deleteTask}
+          onDragEnd = {onDragEnd}
         />
     </div>
   );
