@@ -10,17 +10,20 @@ import React from 'react';
 const ListItem = (props) => {
     return (
         <Draggable key={props.id} draggableId={"Item #" + props.id} index={props.idx}>
-            {provided => (
+            {(provided, snapshot) => (
                 <div className='ListItem'
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
+                    onClick={props.handleListClick}
+                    // isDragging={snapshot.isDragging}
+                    // isSelected={isSelected}
+                    // isGhosting={isGhosting}
                 >
                     <LevelIndicator level={props.level}/>
                     
-                    <span className="ItemText" >Idx: {props.idx}, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ID: {props.id}, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Parent: {props.parent}, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Children: {props.children}</span>
+                    {/* <span className="ItemText" >Idx: {props.idx}, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ID: {props.id}, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Parent: {props.parent}, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Children: {props.children}</span> */}
 
-                    {/*
                     {props.isFocused &&
                         <textarea 
                             className="ItemText" 
@@ -41,7 +44,6 @@ const ListItem = (props) => {
                         {props.text}
                         </span>
                     }
-                    */}
                     
                     <UnindentButton idx={props.idx} unindentTask={props.unindentTask}/>
                     <IndentButton idx={props.idx} indentTask={props.indentTask}/>

@@ -250,6 +250,14 @@ function App() {
   
   /***TASK LIST MANIPULATION CALLBACKS**********************************************************************/
 
+  ////////// handleListClick()
+  // Changes styling for items that are currently being clicked + dragged (since multi-select will be a thing)
+  const handleListClick = (event) => {
+
+    
+
+  }
+
   ////////// reorderList()
   // Functions to help with reordering
   const reorderList = (stateCopy, startIndex, endIndex) => {
