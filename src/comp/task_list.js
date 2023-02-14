@@ -23,6 +23,7 @@ const TaskList = (props) => {
                 unindentTask = {props.unindentTask}
                 deleteTask = {props.deleteTask}
                 onDragEnd = {props.onDragEnd}
+                onBeforeCapture = {props.onBeforeCapture}
             />
 
             {/* <AddTaskButton /> */}

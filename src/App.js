@@ -19,6 +19,7 @@ function App() {
       parent: x - 1, 
       children: (x < 4) ? [x + 1, ] : [],
       isFocused: false,
+      isSelected: false,
     }
   });
 
@@ -63,6 +64,7 @@ function App() {
       parent: newParent, 
       children: [],
       isFocused: false,
+      isSelected: false,
     };
 
     const newItems = [...listItems];
@@ -177,19 +179,22 @@ function App() {
   const mapChildren = (idx, stateCopy, f, paramList = []) => {
     // First get the list of the current children and apply the function to it
     let childrenIndices = findChildrenIndices(idx, stateCopy);
+    let returnArray = [];
+    
     
     for (let i = 0; i < childrenIndices.length; i++){
       // apply the function to each child
-      f(stateCopy[childrenIndices[i]], ...paramList);
+      returnArray.push( f(stateCopy[childrenIndices[i]], ...paramList) );
       
       // Now for the recursive bit
       // Check to see if that child has any children
       if (stateCopy[childrenIndices[i]].children.length > 0) {
-        mapChildren(childrenIndices[i], stateCopy, f, paramList);
+        returnArray.concat( mapChildren(childrenIndices[i], stateCopy, f, paramList) );
       }
     }
 
-    return stateCopy;
+
+    return returnArray;
   }
 
 
@@ -247,35 +252,91 @@ function App() {
     return childIndexList;
   }
 
+
+  ////////// getDescendants()
+  // Function to traverse all descendants -- Takes an item index and a stateCopy and returns list of IDs
+  const getDescendants = (idx, stateCopy) => {
+    // Define the function we'll pass to mapChildren
+    const returnID = (child) => {
+      return child.id;
+    };
+
+    return mapChildren(idx, stateCopy, returnID);
+  }
   
   /***TASK LIST MANIPULATION CALLBACKS**********************************************************************/
 
   ////////// handleListClick()
   // Changes styling for items that are currently being clicked + dragged (since multi-select will be a thing)
-  const handleListClick = (event) => {
-
+  // const handleListClick = (event, idx, snapshot) => {
+  //   snapshot.isDragging;
     
 
+  // }
+
+  const onBeforeCapture = (start) => {
+    const draggableId = start.draggableId;
+    let newList = [...listItems];
+    const idx = getIndex(parseInt(draggableId), newList);
+    
+    
+    newList[idx].isSelected = true;
+
+    setListItems( newList );
+    return;
+
   }
+
 
   ////////// reorderList()
   // Functions to help with reordering
   const reorderList = (stateCopy, startIndex, endIndex) => {
     const result = Array.from(stateCopy);
-    const [removed] = result.splice(startIndex, 1);
-    result.splice(endIndex, 0, removed);
-    
+    const itemID = result[startIndex].id;
 
-    // Need to add logic to see if it's a task with children and include them in the drag....
-
-
-    // TODO: Need to add logic to this to adjust parents, children, and levels
+    // Logic to this to adjust parents, children, and levels
     // First we find the new parent
-    // Then we add the item to the children of the new parent
-    // Remove it from children of the old parent
-    // And adjust levels as needed
+    const newParentIndex = findNewParent(endIndex, result);
+    const newParentID = result[newParentIndex].id;
 
+    // As well as the old parent
+    const oldParentID = result[startIndex].parent;
+    const oldParentIndex = getIndex(oldParentID, result);
     
+    // Adjust the item's parent entry
+    result[startIndex].parent = newParentID;
+
+    // Then we add the item to the children of the new parent
+    // First check to make sure the child isn't already in the parent's children
+    if (result[newParentIndex].children.indexOf(itemID) === -1) {
+      result[newParentIndex].children = result[newParentIndex].children.concat(itemID).slice();
+    }
+
+    // Remove it from children of the old parent
+    if(result[oldParentIndex].children.indexOf(itemID) >= 0) {
+      let newChildList = result[oldParentIndex].children;
+      newChildList.splice( result[oldParentIndex].children.indexOf(itemID), 1 );
+
+      result[oldParentIndex].children = newChildList.slice();  
+    }
+
+    // Figure out how many elements we need to shift (the item + all its descendants)
+    const descendants = getDescendants(startIndex, result);
+    const numDescendants = descendants.length;
+    
+    // And adjust levels as needed -- the item will be 1 level more indented than its new parent
+    const levelDiff = (result[newParentIndex].level + 1) - result[startIndex].level;
+    result[startIndex].level += levelDiff;
+    mapChildren(startIndex, result, (x) => x.level += levelDiff);
+    
+    
+    
+    // Need to add logic to see if it's a task with children and include them in the drag....
+    
+    // And finally, perform the transposition of the item + descendants to new index
+    const removed = result.splice(startIndex, numDescendants + 1);
+    // console.log(...removed.map((x) => x.id));
+    result.splice(endIndex, 0, ...removed);
 
     return result;
   };
@@ -297,6 +358,9 @@ function App() {
       result.source.index,
       result.destination.index
     );
+
+    // Now set all listitems to be unselected
+    newList.map(x => x.isSelected = false);
 
     setListItems( newList );
   }
@@ -349,7 +413,8 @@ function App() {
     
     // 5) Children need to have their level updated
     const increment = (x) => x.level += 1;
-    newList = mapChildren(idx, newList, increment);
+    mapChildren(idx, newList, increment);
+    // newList = mapChildren(idx, newList, increment);
     
     setListItems(newList);
     return newLevel;
@@ -411,7 +476,8 @@ function App() {
     }
   
     // 5) Children need to have their level updated
-    newList = mapChildren(idx, newList, (x) => x.level -= 1);
+    // newList = mapChildren(idx, newList, (x) => x.level -= 1);
+    mapChildren(idx, newList, (x) => x.level -= 1);
 
     // 6) THIS IS ONLY APPLICABLE TO UNINDENTS - Check to see if you've picked up any new children and add them to new task/remove them from old task
     // So we need to :
@@ -482,7 +548,8 @@ function App() {
     })
 
     // And now bump down the level of all descendants
-    newList = mapChildren(taskIdx, newList, (x) => x.level -= 1);
+    // newList = mapChildren(taskIdx, newList, (x) => x.level -= 1);
+    mapChildren(taskIdx, newList, (x) => x.level -= 1);
 
     // And remove the task last -- because otherwise we don't know what's going on 
     const removedTask = newList.splice(taskIdx, 1);
@@ -507,6 +574,7 @@ function App() {
           unindentTask = {unindentTask}
           deleteTask = {deleteTask}
           onDragEnd = {onDragEnd}
+          onBeforeCapture = {onBeforeCapture}
         />
     </div>
   );

@@ -25,6 +25,8 @@ const ListBody = (props) => {
             parent={item.parent}  
             children={item.children}
             isFocused={item.isFocused}
+            isSelected = {item.isSelected}
+            // callback functions
             addTask={props.addTask}  
             inFocus={props.inFocus} 
             outFocus={props.outFocus}
@@ -35,13 +37,12 @@ const ListBody = (props) => {
             unindentTask = {props.unindentTask}
             deleteTask = {props.deleteTask}
 
-
         />)
     });
     return (
-        <DragDropContext onDragEnd={props.onDragEnd}>
+        <DragDropContext onBeforeCapture={props.onBeforeCapture} onDragEnd={props.onDragEnd}>
         <Droppable droppableId="list">
-            {provided => (
+            {(provided, snapshot) => (
                 // ref is for DND 
                 <div className='ListBody' ref={provided.innerRef} {...provided.droppableProps}>
                     {listItems}
