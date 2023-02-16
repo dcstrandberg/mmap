@@ -1,3 +1,5 @@
+// TODO: Add undo feature
+
 import React from 'react';
 import './App.css';
 import TaskList from './comp/task_list.js';
@@ -226,9 +228,8 @@ function App() {
     let childIndexList = [];
 
     // We also want to limit the list to direct children (not grandchildren)
-    // So we need to determine the previous parent of the lowest level child...
-    // ... and only include children of that parent
-    let previousParent = -1;
+    // So we need to determine the previous parents of the lowest level children...
+    // let previousParent = [];
 
     
     // begin at the index and check each task until the level is equal to the item's
@@ -239,14 +240,14 @@ function App() {
       }
       
       // If it's the first iteration of the loop, check to see who the parent is
-      if (i === idx + 1) {
-        previousParent = stateCopy[i].parent;
-      }
+      // if (i === idx + 1) {
+      //   previousParent = stateCopy[i].parent;
+      // }
 
       // And if the child shares that parent, add it to the array
-      if (stateCopy[i].parent === previousParent) {
+      // if (stateCopy[i].parent === previousParent) {
         childIndexList.push(i);
-      }
+      // }
     }
 
     return childIndexList;
@@ -428,7 +429,7 @@ function App() {
     if (listItems[idx].level === 0) {
       return;
     }
-
+    
     // First get the ID of the current Item-of-Interest
     const id = listItems[idx].id
     
@@ -478,42 +479,55 @@ function App() {
     // 5) Children need to have their level updated
     // newList = mapChildren(idx, newList, (x) => x.level -= 1);
     mapChildren(idx, newList, (x) => x.level -= 1);
-
+    
+    // We also need to deal with finding children that get absorbed and 1) Remove them from the old parent and 2) Add them to the New Parent, and 3) Modify their parent
+  
     // 6) THIS IS ONLY APPLICABLE TO UNINDENTS - Check to see if you've picked up any new children and add them to new task/remove them from old task
     // So we need to :
     // a. check to see if the item below (or group of items) has higher level BEFORE an item that's at <= level
     // b. IF SO, make their parent the item
     // c. remove them from the child list of the old parent
     // d. add them to the child list of the item
-    if (newList[idx + 1].level > newList[idx].level) {
-      const childIndexList = findNewChildren(idx, newList);
-      const childIDList = childIndexList.map((x) => newList[x].id);
+    // if (idx + 1 < newList.length) {
+      if ((idx + 1 < newList.length ) && (newList[idx + 1].level > newList[idx].level)) {
+        const childIndexList = findNewChildren(idx, newList);
+        console.log("New Children: " + childIndexList);
+        const childIDList = childIndexList.map((x) => newList[x].id);
+        
+        // Children might have different previous parents, so this needs to be a list
+        const previousParentList = childIndexList.map((x) => getIndex(newList[x].parent, newList));
+        
+        // Set the item to be the parent of the children
+        childIndexList.map((x) => {
+          newList[x].parent = newList[idx].id;
+        });
+        
+        // Now remove the children from the old parent's children list
+        // Need to loop through each previous parent -- may be a smarter way to do this....
+        let tempChildren = [];
 
-      const previousParent = getIndex(newList[childIndexList[0]].parent, newList);
+        for (let j = 0; j < previousParentList.length; j++) {
+          
+          tempChildren = newList[previousParentList[j]].children;
+          
+          childIDList.map((id) => {
+            // Check whether the child is in the previousParent's children list
+            const tempIdx = tempChildren.findIndex((x) => x === id);
+            if (tempIdx >= 0) {
+              // If it is, cut it out
+              tempChildren.splice(tempIdx, 1);
+            }
+          });
+          
+          // Need the slice() method here to change the array's reference in order to force a re-render
+          newList[previousParentList[j]].children = tempChildren.slice();
 
-      // Set the item to be the parent of the children
-      childIndexList.map((x) => {
-        newList[x].parent = newList[idx].id;
-      });
-      
-      // Now remove the children from the old parent's children list
-      let tempChildren = newList[previousParent].children;
-      
-      childIDList.map((id) => {
-        // Check whether the child is in the previousParent's children list
-        const tempIdx = tempChildren.findIndex((x) => x === id);
-        if (tempIdx >= 0) {
-          // If it is, cut it out
-          tempChildren.splice(tempIdx, 1);
         }
-      });
-      
-      // Need the slice() method here to change the array's reference in order to force a re-render
-      newList[previousParent].children = tempChildren.slice();
-      
-      // And finally, add them to the children list of the item
-      newList[idx].children = newList[idx].children.concat(childIDList);      
-    }
+
+        // And finally, add them to the children list of the item
+        newList[idx].children = newList[idx].children.concat(childIDList);      
+      }
+    // }
     
     setListItems(newList);
     return newLevel;
